@@ -5,28 +5,28 @@ import { RecordFormat, RecordCategory } from './record.enum';
 @Schema({ timestamps: true })
 export class Record extends Document {
   @Prop({ required: true })
-  artist: string;
+  artist!: string;
 
   @Prop({ required: true })
-  album: string;
+  album!: string;
 
   @Prop({ required: true })
-  price: number;
+  price!: number;
 
   @Prop({ required: true })
-  qty: number;
+  qty!: number;
 
   @Prop({ enum: RecordFormat, required: true })
-  format: RecordFormat;
+  format!: RecordFormat;
 
   @Prop({ enum: RecordCategory, required: true })
-  category: RecordCategory;
+  category!: RecordCategory;
 
   @Prop({ default: Date.now })
-  created: Date;
+  created!: Date;
 
   @Prop({ default: Date.now })
-  lastModified: Date;
+  lastModified!: Date;
 
   @Prop({ required: false })
   mbid?: string;

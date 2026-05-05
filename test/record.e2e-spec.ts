@@ -1,13 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
+import { Model } from 'mongoose';
 import { AppModule } from '../src/app.module';
 import { RecordFormat, RecordCategory } from '../src/api/schemas/record.enum';
+import { customizeApp } from '../src/app.customizer';
 
 describe('RecordController (e2e)', () => {
   let app: INestApplication;
   let recordId: string;
-  let recordModel;
+  let recordModel: Model<any>;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,11 +17,11 @@ describe('RecordController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    customizeApp(app);
     recordModel = app.get('RecordModel');
     await app.init();
   });
 
-  // Test to create a record
   it('should create a new record', async () => {
     const createRecordDto = {
       artist: 'The Beatles',
@@ -31,7 +33,7 @@ describe('RecordController (e2e)', () => {
     };
 
     const response = await request(app.getHttpServer())
-      .post('/records')
+      .post('/api/v1/records')
       .send(createRecordDto)
       .expect(201);
 
@@ -51,18 +53,19 @@ describe('RecordController (e2e)', () => {
     };
 
     const createResponse = await request(app.getHttpServer())
-      .post('/records')
+      .post('/api/v1/records')
       .send(createRecordDto)
       .expect(201);
 
     recordId = createResponse.body._id;
 
     const response = await request(app.getHttpServer())
-      .get('/records?artist=The Fake Band')
+      .get('/api/v1/records?artist=The Fake Band')
       .expect(200);
-    expect(response.body.length).toBe(1);
-    expect(response.body[0]).toHaveProperty('artist', 'The Fake Band');
+    expect(response.body.data.length).toBe(1);
+    expect(response.body.data[0]).toHaveProperty('artist', 'The Fake Band');
   });
+
   afterEach(async () => {
     if (recordId) {
       await recordModel.findByIdAndDelete(recordId);

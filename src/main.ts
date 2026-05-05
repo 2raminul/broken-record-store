@@ -1,27 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AppConfig } from './app.config';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'; // Import Swagger
-import { ValidationPipe } from '@nestjs/common';
+import { customizeApp } from './app.customizer';
+import { AppConfigService } from './app-config/app-config.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-    }),
-  );
-  // Swagger configuration
-  const config = new DocumentBuilder()
-    .setTitle('Record API')
-    .setDescription('The record management API')
-    .build();
+  customizeApp(app);
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, document);
-
-  await app.listen(AppConfig.port);
+  const appConfig = app.get(AppConfigService);
+  await app.listen(appConfig.get('port'));
 }
+
 bootstrap();

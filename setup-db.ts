@@ -1,8 +1,16 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import * as mongoose from 'mongoose';
 import { Record, RecordSchema } from './src/api/schemas/record.schema';
 import * as fs from 'fs';
-import { AppConfig } from './src/app.config';
 import * as readline from 'readline';
+
+const MONGO_URL = process.env.MONGO_URL;
+if (!MONGO_URL) {
+  console.error('MONGO_URL is not set in .env');
+  process.exit(1);
+}
 
 async function setupDatabase() {
   try {
@@ -16,13 +24,13 @@ async function setupDatabase() {
       async (answer) => {
         rl.close();
 
-        const data = JSON.parse(fs.readFileSync('data.json', 'utf-8'));
+        const data = JSON.parse(fs.readFileSync('data.json', 'utf-8')) as unknown[];
         const recordModel: mongoose.Model<Record> = mongoose.model<Record>(
           'Record',
           RecordSchema,
         );
 
-        await mongoose.connect(AppConfig.mongoUrl);
+        await mongoose.connect(MONGO_URL!);
 
         if (answer.toLowerCase() === 'y') {
           await recordModel.deleteMany({});
@@ -32,12 +40,12 @@ async function setupDatabase() {
         const records = await recordModel.insertMany(data);
         console.log(`Inserted ${records.length} records successfully!`);
 
-        mongoose.disconnect();
+        await mongoose.disconnect();
       },
     );
   } catch (error) {
     console.error('Error setting up the database:', error);
-    mongoose.disconnect();
+    await mongoose.disconnect();
   }
 }
 
