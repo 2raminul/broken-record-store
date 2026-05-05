@@ -5,6 +5,7 @@ import { AppConfigModule } from './app-config/app-config.module';
 import { AppConfigService } from './app-config/app-config.service';
 import { HealthModule } from './health/health.module';
 import { RecordsModule } from './core/records/records.module';
+import { OrdersModule } from './core/orders/orders.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RecordsModule } from './core/records/records.module';
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     HealthModule,
     RecordsModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}
