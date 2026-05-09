@@ -151,7 +151,7 @@ describe("RecordsService", () => {
     it("returns cached result on cache hit", async () => {
       const cached = {
         data: [],
-        meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
+        paginationMetadata: { totalItemsAcrossAllPages: 0 },
       };
       cache.get.mockResolvedValue(cached);
 

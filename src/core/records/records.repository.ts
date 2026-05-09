@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
-import { Record } from './schemas/record.schema';
-import { FindRecordsInDto } from './dto/find-records.in.dto';
-import { escapeRegex } from '../../common/utils/escape-regex';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { FilterQuery, Model } from "mongoose";
+import { Record } from "./schemas/record.schema";
+import { FindRecordsInDto } from "./dto/find-records.in.dto";
+import { escapeRegex } from "../../common/utils/escape-regex";
 
 @Injectable()
 export class RecordsRepository {
@@ -24,7 +24,11 @@ export class RecordsRepository {
     update: Partial<Record>,
   ): Promise<Record | null> {
     return this.recordModel
-      .findByIdAndUpdate(id, { $set: update }, { new: true, runValidators: true })
+      .findByIdAndUpdate(
+        id,
+        { $set: update },
+        { new: true, runValidators: true },
+      )
       .exec();
   }
 
@@ -32,13 +36,13 @@ export class RecordsRepository {
     filters: FindRecordsInDto,
   ): Promise<{ records: Record[]; total: number }> {
     const query = this.buildFilterQuery(filters);
-    const { page, limit } = filters;
-    const skip = (page - 1) * limit;
+    const { offset, limit } = filters;
+    const skip = offset;
 
     const [records, total] = await Promise.all([
       this.recordModel
         .find(query)
-        .sort(filters.q ? { score: { $meta: 'textScore' } } : { createdAt: -1 })
+        .sort(filters.q ? { score: { $meta: "textScore" } } : { createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .exec(),
@@ -56,11 +60,11 @@ export class RecordsRepository {
     }
 
     if (filters.artist) {
-      query.artist = { $regex: escapeRegex(filters.artist), $options: 'i' };
+      query.artist = { $regex: escapeRegex(filters.artist), $options: "i" };
     }
 
     if (filters.album) {
-      query.album = { $regex: escapeRegex(filters.album), $options: 'i' };
+      query.album = { $regex: escapeRegex(filters.album), $options: "i" };
     }
 
     if (filters.format) {

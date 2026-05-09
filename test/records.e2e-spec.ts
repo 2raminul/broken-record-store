@@ -94,13 +94,30 @@ describe("Records (e2e)", () => {
         );
     });
 
-    it("returns paginated results", async () => {
+    it("returns paginated results with correct response shape", async () => {
       const res = await request(app.getHttpServer())
-        .get("/api/v1/records?page=1&limit=5")
+        .get("/api/v1/records?offset=0&limit=5")
         .expect(200);
       expect(res.body).toHaveProperty("data");
-      expect(res.body).toHaveProperty("meta");
-      expect(res.body.meta).toMatchObject({ page: 1, limit: 5 });
+      expect(res.body).toHaveProperty("paginationMetadata");
+      expect(res.body.paginationMetadata).toHaveProperty(
+        "totalItemsAcrossAllPages",
+      );
+      expect(res.body.data.length).toBeLessThanOrEqual(5);
+    });
+
+    it("respects offset — second page excludes first page items", async () => {
+      const first = await request(app.getHttpServer())
+        .get("/api/v1/records?offset=0&limit=2")
+        .expect(200);
+      const second = await request(app.getHttpServer())
+        .get("/api/v1/records?offset=2&limit=2")
+        .expect(200);
+
+      const firstIds = first.body.data.map((r: any) => r.id);
+      const secondIds = second.body.data.map((r: any) => r.id);
+      const overlap = firstIds.filter((id: string) => secondIds.includes(id));
+      expect(overlap).toHaveLength(0);
     });
 
     it("filters by format", async () => {
@@ -120,6 +137,12 @@ describe("Records (e2e)", () => {
     it("returns 400 for invalid format enum", async () => {
       await request(app.getHttpServer())
         .get("/api/v1/records?format=Wax")
+        .expect(400);
+    });
+
+    it("returns 400 when offset exceeds maximum", async () => {
+      await request(app.getHttpServer())
+        .get("/api/v1/records?offset=1000001")
         .expect(400);
     });
   });
@@ -146,6 +169,26 @@ describe("Records (e2e)", () => {
         .send({ price: 99 })
         .expect(200);
       expect(res.body.price).toBe(99);
+    });
+
+    it("returns 409 when update creates a duplicate artist+album+format", async () => {
+      // Create a second record to collide with
+      await request(app.getHttpServer())
+        .post("/api/v1/records")
+        .send(
+          makeRecord({
+            artist: "Update Test",
+            album: "Collision Album",
+            format: RecordFormat.VINYL,
+          }),
+        )
+        .expect(201);
+
+      // Updating recordId's format to VINYL would create a duplicate
+      await request(app.getHttpServer())
+        .put(`/api/v1/records/${recordId}`)
+        .send({ album: "Collision Album", format: RecordFormat.VINYL })
+        .expect(409);
     });
 
     it("returns 404 for unknown id", async () => {

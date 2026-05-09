@@ -1,13 +1,13 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 export enum OrderStatus {
-  CONFIRMED = 'CONFIRMED',
+  CONFIRMED = "CONFIRMED",
 }
 
 @Schema({ timestamps: true })
 export class Order extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'Record', required: true, index: true })
+  @Prop({ type: Types.ObjectId, ref: "Record", required: true, index: true })
   recordId!: Types.ObjectId;
 
   @Prop({ required: true, min: 1 })
@@ -21,6 +21,8 @@ export class Order extends Document {
 
   @Prop({ enum: OrderStatus, default: OrderStatus.CONFIRMED })
   status!: OrderStatus;
+
+  createdAt!: Date;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

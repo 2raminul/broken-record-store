@@ -62,7 +62,7 @@ function safeCheck(res, checks) {
 
 // ── Setup: collect record IDs for single-record tests ─────────────────────────
 export function setup() {
-  const res  = http.get(`${BASE}/records?page=1&limit=50`);
+  const res  = http.get(`${BASE}/records?offset=0&limit=50`);
   const body = JSON.parse(res.body);
   const ids  = (body.data ?? []).map(r => r.id).filter(Boolean);
   console.log(`Setup: collected ${ids.length} record IDs`);
@@ -76,7 +76,7 @@ export default function (data) {
   if (roll < 0.40) {
     // ── Text search ──────────────────────────────────────────────────────────
     const q   = pick(SEARCH_TERMS);
-    const res = http.get(`${BASE}/records?q=${encodeURIComponent(q)}&page=1&limit=20`);
+    const res = http.get(`${BASE}/records?q=${encodeURIComponent(q)}&offset=0&limit=20`);
     const ok  = safeCheck(res, {
       'search 200': r => r.status === 200,
       'search has data': r => {
@@ -91,7 +91,7 @@ export default function (data) {
     // ── Format + category filter ─────────────────────────────────────────────
     const format   = pick(FORMATS);
     const category = pick(CATEGORIES);
-    const res = http.get(`${BASE}/records?format=${format}&category=${category}&page=1&limit=20`);
+    const res = http.get(`${BASE}/records?format=${format}&category=${category}&offset=0&limit=20`);
     const ok  = safeCheck(res, {
       'filter 200': r => r.status === 200,
       'filter has data': r => {
@@ -104,13 +104,13 @@ export default function (data) {
 
   } else if (roll < 0.85) {
     // ── Paginated list ───────────────────────────────────────────────────────
-    const page = Math.floor(Math.random() * 500) + 1;
-    const res  = http.get(`${BASE}/records?page=${page}&limit=20`);
-    const ok   = safeCheck(res, {
+    const offset = Math.floor(Math.random() * 500) * 20;
+    const res    = http.get(`${BASE}/records?offset=${offset}&limit=20`);
+    const ok     = safeCheck(res, {
       'list 200': r => r.status === 200,
-      'list has meta': r => {
+      'list has paginationMetadata': r => {
         const b = JSON.parse(r.body);
-        return b.meta != null;
+        return b.paginationMetadata != null;
       },
     });
     errorRate.add(!ok);

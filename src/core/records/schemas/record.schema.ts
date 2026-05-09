@@ -1,6 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { RecordFormat, RecordCategory } from './record.enum';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document } from "mongoose";
+import { RecordFormat, RecordCategory } from "./record.enum";
 
 export interface Track {
   title: string;
@@ -31,8 +31,14 @@ export class Record extends Document {
   @Prop({ required: false })
   mbid?: string;
 
-  @Prop({ type: [{ title: String, position: String, length: String }], default: [] })
+  @Prop({
+    type: [{ title: String, position: String, length: String }],
+    default: [],
+  })
   tracklist!: Track[];
+
+  createdAt!: Date;
+  updatedAt!: Date;
 }
 
 export const RecordSchema = SchemaFactory.createForClass(Record);
@@ -43,4 +49,4 @@ RecordSchema.index({ artist: 1, album: 1, format: 1 }, { unique: true });
 // Search & filter performance indexes
 RecordSchema.index({ format: 1 });
 RecordSchema.index({ category: 1 });
-RecordSchema.index({ artist: 'text', album: 'text' });
+RecordSchema.index({ artist: "text", album: "text" });

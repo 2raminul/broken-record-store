@@ -96,7 +96,7 @@ export class OrdersService {
     const { orders, total } =
       await this.ordersRepository.findWithFilters(filters);
     const dtos = orders.map((o) => this.toOutDto(o));
-    return paginate(dtos, total, filters.page, filters.limit);
+    return paginate(dtos, total);
   }
 
   private isTransientError(err: unknown): boolean {
@@ -122,7 +122,7 @@ export class OrdersService {
       unitPrice: order.unitPrice,
       total: order.total,
       status: order.status,
-      createdAt: (order as any).createdAt,
+      createdAt: order.createdAt,
     };
   }
 }

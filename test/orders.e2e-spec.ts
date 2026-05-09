@@ -78,13 +78,26 @@ describe("Orders (e2e)", () => {
   });
 
   describe("GET /api/v1/orders", () => {
-    it("returns paginated order list", async () => {
+    it("returns paginated results with correct response shape", async () => {
       const res = await request(app.getHttpServer())
         .get("/api/v1/orders")
         .expect(200);
       expect(res.body).toHaveProperty("data");
-      expect(res.body).toHaveProperty("meta");
+      expect(res.body).toHaveProperty("paginationMetadata");
+      expect(res.body.paginationMetadata).toHaveProperty(
+        "totalItemsAcrossAllPages",
+      );
       expect(res.body.data.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("respects limit", async () => {
+      const res = await request(app.getHttpServer())
+        .get("/api/v1/orders?offset=0&limit=1")
+        .expect(200);
+      expect(res.body.data.length).toBe(1);
+      expect(
+        res.body.paginationMetadata.totalItemsAcrossAllPages,
+      ).toBeGreaterThanOrEqual(1);
     });
 
     it("filters by recordId", async () => {

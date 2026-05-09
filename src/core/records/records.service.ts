@@ -98,8 +98,6 @@ export class RecordsService {
     const result = paginate(
       records.map((r) => this.toOutDto(r)),
       total,
-      filters.page,
-      filters.limit,
     );
 
     await this.cacheManager.set(cacheKey, result, CACHE_TTL_MS);
@@ -121,7 +119,7 @@ export class RecordsService {
     if (filters.album) params.set("album", filters.album);
     if (filters.format) params.set("format", filters.format);
     if (filters.category) params.set("category", filters.category);
-    params.set("page", String(filters.page));
+    params.set("offset", String(filters.offset));
     params.set("limit", String(filters.limit));
     return `${RECORDS_LIST_CACHE_PREFIX}${params.toString()}`;
   }
@@ -160,8 +158,8 @@ export class RecordsService {
       category: record.category,
       mbid: record.mbid,
       tracklist: record.tracklist,
-      createdAt: (record as any).createdAt,
-      updatedAt: (record as any).updatedAt,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
     };
   }
 

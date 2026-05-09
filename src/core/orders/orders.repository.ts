@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, FilterQuery, Model, Types } from 'mongoose';
-import { Order } from './schemas/order.schema';
-import { FindOrdersInDto } from './dto/find-orders.in.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { ClientSession, FilterQuery, Model, Types } from "mongoose";
+import { Order } from "./schemas/order.schema";
+import { FindOrdersInDto } from "./dto/find-orders.in.dto";
 
 @Injectable()
 export class OrdersRepository {
@@ -24,7 +24,7 @@ export class OrdersRepository {
   }
 
   async findById(id: string): Promise<Order | null> {
-    return this.orderModel.findById(id).populate('recordId').exec();
+    return this.orderModel.findById(id).populate("recordId").exec();
   }
 
   async findWithFilters(
@@ -35,11 +35,16 @@ export class OrdersRepository {
       query.recordId = new Types.ObjectId(filters.recordId);
     }
 
-    const { page, limit } = filters;
-    const skip = (page - 1) * limit;
+    const { offset, limit } = filters;
+    const skip = offset;
 
     const [orders, total] = await Promise.all([
-      this.orderModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      this.orderModel
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
       this.orderModel.countDocuments(query).exec(),
     ]);
 
