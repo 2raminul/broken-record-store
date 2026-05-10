@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+*.env.local
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# MongoDB Memory Server — downloaded mongod binaries (~100MB+; never commit)
+node_modules/.cache/mongodb-memory-server/
+.cache/
+
+# TypeScript incremental build
+*.tsbuildinfo

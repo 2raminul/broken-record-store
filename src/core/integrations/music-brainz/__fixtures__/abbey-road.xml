@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://musicbrainz.org/ns/mmd-2.0#">
+  <release id="b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d">
+    <title>Abbey Road</title>
+    <medium-list count="1">
+      <medium>
+        <position>1</position>
+        <track-list count="2">
+          <track>
+            <position>1</position>
+            <recording>
+              <title>Come Together</title>
+            </recording>
+            <length>259000</length>
+          </track>
+          <track>
+            <position>2</position>
+            <recording>
+              <title>Something</title>
+            </recording>
+            <length>182000</length>
+          </track>
+        </track-list>
+      </medium>
+    </medium-list>
+  </release>
+</metadata>

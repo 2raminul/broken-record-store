@@ -51,7 +51,7 @@ export class UpdateRecordRequestDTO {
   })
   @IsInt()
   @Min(0)
-  @Max(100)
+  @Max(100000)
   @IsOptional()
   qty?: number;
 
